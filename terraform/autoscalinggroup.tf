@@ -8,7 +8,11 @@ resource "aws_autoscaling_group" "scalegroup" {
   metrics_granularity  = "1Minute"
   load_balancers       = ["${aws_elb.elb1.id}"]
   health_check_type    = "ELB"
-  
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tag {
     key                 = "Name"
     value               = "webserver000"
