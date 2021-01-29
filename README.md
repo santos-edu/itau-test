@@ -18,17 +18,17 @@ Está configurado uma politica de scale up/down baseado na utilização de recur
 ```
 ## Pipeline de deploy
 <p align="center">
-	<img src="img/pipeline.png." width="80%" align="center" alt="pipeline">
+	<img src="img/pipeline.png" width="80%" align="center" alt="pipeline">
 </p>
 
 ## Versão 1 da aplicação:
 <p align="center">
-	<img src="img/appv1.png." width="80%" align="center" alt="app-teste1">
+	<img src="img/appv1.png" width="80%" align="center" alt="app-teste1">
 </p>
 
 ## Versão 2 da aplicação:
 <p align="center">
-	<img src="img/appv2.png." width="80%" align="center" alt="app-teste2">
+	<img src="img/appv2.png" width="80%" align="center" alt="app-teste2">
 </p>
 
 ## Desenho da estrutura:
