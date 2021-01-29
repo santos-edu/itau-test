@@ -6,7 +6,7 @@ resource "aws_launch_configuration" "itau-test" {
   image_id        = "${var.ami}"
   instance_type   = "${var.instance_type}"
   security_groups = ["${aws_security_group.websg.id}"]
-  key_name        = "${aws_key_pair.keypar-itau.key_name}"
+  key_name        = "keypar-itau"
   user_data       = "${file("../user-data/bootstrap.sh")}"
 
   lifecycle {
@@ -14,10 +14,10 @@ resource "aws_launch_configuration" "itau-test" {
   }
 }
 
-resource "aws_key_pair" "keypar-itau" {
-  key_name   = "keypar-itau"
-  public_key = "${file("${var.key_path}")}"
-}
+//resource "aws_key_pair" "keypar-itau" {
+//  key_name   = "keypar-itau"
+//  public_key = "${file("${var.key_path}")}"
+//}
 
 resource "aws_autoscaling_policy" "autopolicy" {
   name                   = "terraform-autoplicy"
