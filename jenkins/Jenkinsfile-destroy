@@ -23,34 +23,11 @@ node{
                 ])
         }
 
-        stage('app_build') {
+        stage('terraform_destroy') {
             dir(env.WORKSPACE) {
                 sh """
-                    echo app build
-                """
-            }
-        }
-
-        stage('unit_tests') {
-            dir(env.WORKSPACE) {
-                sh """
-                    echo teste
-                """
-            }
-        }
-
-        stage('terraform_create_deploy') {
-            dir(env.WORKSPACE) {
-                sh """
-                    cd terraform
-                    sed -i s/REPLICAS/2/ autoscalinggroup.tf
-                    sed -i s/REPLI_MAX/4/ autoscalinggroup.tf
-                    terraform init
-                    terraform apply -auto-approve
-                    sleep 1m
-                    sed -i s/2/1/ autoscalinggroup.tf
-                    sed -i s/4/2/ autoscalinggroup.tf
-                    terraform apply -auto-approve
+                    cd /var/lib/jenkins/workspace/itau-test/terraform
+                    terraform destroy -auto-approve
                 """
             }
         }
