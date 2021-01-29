@@ -9,7 +9,7 @@ Resources:
     Properties:
       VPCZoneIdentifier: ["${join("\",\"", var.private-subnet)}"]
       AvailabilityZones: ["${join("\",\"", var.availability_zones)}"]
-      LaunchConfigurationName: "itau-test"
+      LaunchConfigurationName: "${aws_launch_configuration.ecs.name}"
       MinSize: "${var.asg_min_size}"
       MaxSize: "${var.asg_max_size}"
       DesiredCapacity: "${var.asg_desired_capacity}"
