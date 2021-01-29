@@ -48,7 +48,7 @@ node{
                     sed -i s/REPLI_MAX/6/ autoscalinggroup.tf
                     terraform init
                     terraform apply -auto-approve
-                    sleep 1m
+                    sleep 60
                     sed -i s/2/1/ autoscalinggroup.tf
                     sed -i s/6/4/ autoscalinggroup.tf
                     terraform apply -auto-approve
