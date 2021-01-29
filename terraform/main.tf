@@ -5,7 +5,7 @@ provider "aws" {
 resource "aws_launch_configuration" "itau-test" {
   image_id        = "${var.ami}"
   instance_type   = "${var.instance_type}"
-  security_groups = ["${aws_security_group.websg.id}"]
+  security_groups = ["${var.sg_loadbalancer}"]
   key_name        = "keypar-itau"
   user_data       = "${file("../user-data/bootstrap.sh")}"
 
@@ -125,7 +125,7 @@ resource "aws_launch_configuration" "itau-test" {
 resource "aws_elb" "elb1" {
   name               = "terraform-elb"
   availability_zones = "${var.availability_zones}"
-  security_groups    = "${var.sg_loadbalancer}"
+  security_groups    = ["${var.sg_loadbalancer}"]
 
   listener {
     instance_port     = 80
