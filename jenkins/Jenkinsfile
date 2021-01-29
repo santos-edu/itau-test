@@ -3,9 +3,6 @@ node{
         def PROJECT = "itau-test"
         def REPO_GIT = "git@github.com:santos-edu/itau-test.git"
         def BRANCH_NAME = "main"
-        def IMAGE_VERSION = "$BUILD_NUMBER"
-
-        def ECR_URL = "268510435705.dkr.ecr.sa-east-1.amazonaws.com/itau-test"
 
         message = "PIPELINE STARTED IN BRANCH $BRANCH_NAME - Build $BUILD_NUMBER"
 
@@ -42,23 +39,10 @@ node{
             }
         }
 
-        stage('push_container_to_ECR') {
-            def LOGIN_CMD = sh(script: "aws ecr get-login --no-include-email --region sa-east-1", returnStdout: true)
-            dir(env.WORKSPACE) {
-                sh """
-                    cd jenkins
-                    ${LOGIN_CMD}
-                    docker build --no-cache -t $ECR_URL:$IMAGE_VERSION -f Dockerfile .
-                    docker push $ECR_URL:$IMAGE_VERSION
-                """
-            }
-        }
-
         stage('terraform_create_deploy') {
             dir(env.WORKSPACE) {
                 sh """
                     cd terraform
-                    sed -i s/__ID__/$IMAGE_VERSION/ ../user-data/bootstrap.sh
                     sed -i s/REPLICAS/4/ autoscalinggroup.tf
                     sed -i s/REPLI_MAX/8/ autoscalinggroup.tf
                     terraform init
@@ -67,7 +51,6 @@ node{
                     sed -i s/4/2/ autoscalinggroup.tf
                     sed -i s/8/4/ autoscalinggroup.tf
                     terraform apply -auto-approve
-                    docker system prune -a -f
                 """
             }
         }
