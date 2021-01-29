@@ -9,7 +9,7 @@ Resources:
     Properties:
       VPCZoneIdentifier: ["${join("\",\"", var.private-subnet)}"]
       AvailabilityZones: ["${join("\",\"", var.availability_zones)}"]
-      LaunchConfigurationName: "${aws_launch_configuration.ecs.name}"
+      LaunchConfigurationName: "terraform-20210129162603917700000002"
       MinSize: "${var.asg_min_size}"
       MaxSize: "${var.asg_max_size}"
       DesiredCapacity: "${var.asg_desired_capacity}"
