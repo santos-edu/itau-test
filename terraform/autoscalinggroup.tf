@@ -9,7 +9,6 @@ resource "aws_autoscaling_group" "scalegroup" {
   metrics_granularity  = "1Minute"
   load_balancers       = ["${aws_elb.elb1.id}"]
   health_check_type    = "ELB"
-  launch_configuration = "${aws_launch_configuration.worker.name}"
   vpc_zone_identifier  = ["${aws_subnet.public.*.id}"]
 
   tag {
