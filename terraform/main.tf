@@ -19,13 +19,13 @@ resource "aws_launch_configuration" "itau-test" {
 //  public_key = "${file("${var.key_path}")}"
 //}
 
-resource "aws_autoscaling_policy" "autopolicy" {
-  name                   = "terraform-autoplicy"
-  scaling_adjustment     = 1
-  adjustment_type        = "ChangeInCapacity"
-  cooldown               = 300
-  autoscaling_group_name = "${aws_autoscaling_group.scalegroup.name}"
-}
+//resource "aws_autoscaling_policy" "autopolicy" {
+//  name                   = "terraform-autoplicy"
+//  scaling_adjustment     = 1
+//  adjustment_type        = "ChangeInCapacity"
+//  cooldown               = 300
+//  autoscaling_group_name = "${aws_autoscaling_group.scalegroup.name}"
+//}
 
 resource "aws_cloudwatch_metric_alarm" "cpualarm" {
   alarm_name          = "terraform-alarm"
@@ -38,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "cpualarm" {
   threshold           = "60"
 
   dimensions = {
-    AutoScalingGroupName = "${aws_autoscaling_group.scalegroup.name}"
+    AutoScalingGroupName = "itau-test"
   }
 
   alarm_description = "This metric monitor EC2 instance cpu utilization"
