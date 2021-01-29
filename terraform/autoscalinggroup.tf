@@ -3,7 +3,7 @@ resource "aws_autoscaling_group" "scalegroup" {
   availability_zones   = ["sa-east-1a", "sa-east-1b", "sa-east-1c"]
   min_size             = REPLICAS
   max_size             = REPLI_MAX
-  desired_capacity     = 1
+  desired_capacity     = 2
   enabled_metrics      = ["GroupMinSize", "GroupMaxSize", "GroupDesiredCapacity", "GroupInServiceInstances", "GroupTotalInstances"]
   metrics_granularity  = "1Minute"
   load_balancers       = ["${aws_elb.elb1.id}"]
