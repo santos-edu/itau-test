@@ -43,13 +43,7 @@ node{
             dir(env.WORKSPACE) {
                 sh """
                     cd terraform
-                    sed -i s/REPLICAS/2/ autoscalinggroup.tf
-                    sed -i s/REPLI_MAX/4/ autoscalinggroup.tf
                     terraform init
-                    terraform apply -auto-approve
-                    sleep 1m
-                    sed -i s/2/1/ autoscalinggroup.tf
-                    sed -i s/4/2/ autoscalinggroup.tf
                     terraform apply -auto-approve
                 """
             }
