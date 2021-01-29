@@ -7,6 +7,7 @@ Resources:
   ASG:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
+      VPCZoneIdentifier: ["${join("\",\"", var.vpc_id)}"]
       AvailabilityZones: ["${join("\",\"", var.availability_zones)}"]
       LaunchConfigurationName: "terraform-20210129162603917700000002"
       MinSize: "${var.asg_min_size}"
