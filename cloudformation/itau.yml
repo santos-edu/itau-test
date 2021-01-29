@@ -128,24 +128,6 @@ Resources:
       RouteTableId: !Ref PrivadaRouteTable
       SubnetId: !Ref NovaSubnet3
 
-# CRIANDO O SEC GROUP PARA BANCO DE DADOS
-  BANCOSecGroup:  
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName: DB
-      GroupDescription: Sec Group para os Web Servers
-      VpcId: !Ref NovoVPC
-      SecurityGroupIngress:
-        - 
-          IpProtocol: tcp
-          FromPort: 3306
-          ToPort: 3306
-          CidrIp: 10.100.0.0/16
-        - 
-          IpProtocol: tcp
-          FromPort: 5432
-          ToPort: 5432
-          CidrIp: 10.100.0.0/16
 
 # CRIANDO O SEC GROUP WEB
   NovoWEBSecGroup:
