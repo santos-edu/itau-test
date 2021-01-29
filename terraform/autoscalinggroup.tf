@@ -22,7 +22,7 @@ resource "aws_autoscaling_group" "scalegroup" {
 
 resource "aws_autoscaling_lifecycle_hook" "LCH-SG-app-test-A" {
   name                   = "LCH-SG-itau"
-  autoscaling_group_name = aws_autoscaling_group.app-test.name
+  autoscaling_group_name = aws_autoscaling_group.scalegroup.name
   default_result         = "CONTINUE"
   heartbeat_timeout      = 60
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_LAUNCHING"
