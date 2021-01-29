@@ -1,0 +1,179 @@
+Resources:
+# CRIANDO O MEU VPC
+  NovoVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.100.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+      - Key: Name
+        Value: !Sub ${AWS::StackName}-VPC
+
+# CRIANDO O INTERNET GATEWAY
+  NovoInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: NovoVPC
+
+# CONECTANDO O IG COM O VPC
+  NovoAttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref NovoVPC
+      InternetGatewayId: !Ref NovoInternetGateway
+
+# CRIANDO A SUBNET PUBLICA
+  NovaSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.100.1.0/24
+      VpcId: !Ref NovoVPC
+      AvailabilityZone: !Select [0, !GetAZs '' ]
+      Tags:
+      - Key: Name
+        Value: !Sub ${AWS::StackName}-Publica
+
+# CRIANDO A SUBNET PRIVADA
+  NovaSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.100.10.0/24
+      VpcId: !Ref NovoVPC
+      AvailabilityZone: !Select [0, !GetAZs '' ]
+      Tags:
+      - Key: Name
+        Value: !Sub ${AWS::StackName}-Privada
+
+# CRIANDO A SUBNET PRIVADA
+  NovaSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.100.40.0/24
+      VpcId: !Ref NovoVPC
+      AvailabilityZone: !Select [1, !GetAZs '' ]
+      Tags:
+      - Key: Name
+        Value: !Sub ${AWS::StackName}-Privada-2
+
+
+# CRIANDO O ELASTIC IP PARA O NAT GATEWAY
+  NATGatewayElasticIp:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: NovoVPC
+
+# CRIANDO O NAT GATEWAY
+  NovoNATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATGatewayElasticIp.AllocationId
+      SubnetId: !Ref NovaSubnet1
+      Tags:
+      - Key: Name
+        Value: !Join ['', ["NAT-", !Ref "AWS::StackName" ]]
+
+# CRIANDO A ROUTE TABLE PRIVADA
+  PrivadaRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref NovoVPC
+      Tags: 
+      - Key: Name
+        Value: Privada
+
+# CRIANDO A ROUTE PRIVADA CONECTANDO NA ROUTE TABLE PRIVADA E NO NAT GW
+  PrivadaRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivadaRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NovoNATGateway
+
+# CRIANDO A ROUTE TABLE PUBLICA
+  PublicaRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref NovoVPC
+      Tags: 
+      - Key: Name
+        Value: Publica
+
+# CRIANDO A ROUTE PUBLICA CONECTANDO NA ROUTE TABLE PUBLICA E NO NAT GW
+  PublicaRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicaRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref NovoInternetGateway
+
+# ASSOCIANDO A TABELA DE ROTAS COM A SUBNET PUBLICA
+  PublicaRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicaRouteTable
+      SubnetId: !Ref NovaSubnet1
+
+
+# ASSOCIANDO A TABELA DE ROTAS COM A SUBNET PRIVADA  
+  PrivadaRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivadaRouteTable
+      SubnetId: !Ref NovaSubnet2
+
+# ASSOCIANDO A TABELA DE ROTAS COM A SUBNET PRIVADA  
+  PrivadaRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivadaRouteTable
+      SubnetId: !Ref NovaSubnet3
+
+# CRIANDO O SEC GROUP PARA BANCO DE DADOS
+  BANCOSecGroup:  
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: DB
+      GroupDescription: Sec Group para os Web Servers
+      VpcId: !Ref NovoVPC
+      SecurityGroupIngress:
+        - 
+          IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 10.100.0.0/16
+        - 
+          IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 10.100.0.0/16
+
+# CRIANDO O SEC GROUP WEB
+  NovoWEBSecGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: Webservers
+      GroupDescription: Sec Group para os Web Servers
+      VpcId: !Ref NovoVPC
+      SecurityGroupIngress:
+        - 
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - 
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - 
+          IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+        - 
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+

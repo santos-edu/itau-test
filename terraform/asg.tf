@@ -1,7 +1,6 @@
-
 resource "aws_autoscaling_group" "scalegroup" {
   launch_configuration = "${aws_launch_configuration.itau-test.name}"
-  availability_zones   = ["sa-east-1a", "sa-east-1b", "sa-east-1c"]
+  availability_zones   = "${var.availability_zones}"
   min_size             = REPLICAS
   max_size             = REPLI_MAX
   enabled_metrics      = ["GroupMinSize", "GroupMaxSize", "GroupDesiredCapacity", "GroupInServiceInstances", "GroupTotalInstances"]
@@ -57,4 +56,9 @@ Resources:
         WaitOnResourceSignals: true
     DeletionPolicy: Retain
   EOF
+
+  tag {
+    key                 = "Name"
+    value               = "webserver000"
+  }
 }
