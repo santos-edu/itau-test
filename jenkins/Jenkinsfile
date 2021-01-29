@@ -16,7 +16,7 @@ node{
         stage("cloning_$PROJECT") {
                 checkout([$class: 'GitSCM',
                     userRemoteConfigs: [[url: "$REPO_GIT"]],
-                    branches: [[name: "$BRANCH_NAME"]],
+                    branches: [[name: "v2"]],
                     credentialsId: 'TxMVYzKaAYMhskKNiqav',
                     clean: false,
                     extensions: [[$class: 'SubmoduleOption',
