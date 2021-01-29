@@ -44,7 +44,9 @@ node{
                 sh """
                     cd terraform
                     terraform init
+                    sed -i s/REPLI_MAX/8/ autoscalinggroup.tf
                     terraform apply -auto-approve
+                    sed -i s/REPLI_MAX/6/ autoscalinggroup.tf
                 """
             }
         }
