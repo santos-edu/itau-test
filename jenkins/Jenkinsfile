@@ -5,14 +5,7 @@ node{
         def BRANCH_NAME = "main"
 
         message = "PIPELINE STARTED IN BRANCH $BRANCH_NAME - Build $BUILD_NUMBER"
-        
-        stage('clean') {
-            dir(env.WORKSPACE) {
-                sh """
-                    rm -rf $WORKSPACE/*
-                """
-            }
-        }
+ 
         stage("cloning_$PROJECT") {
                 checkout([$class: 'GitSCM',
                     userRemoteConfigs: [[url: "$REPO_GIT"]],
@@ -50,14 +43,8 @@ node{
             dir(env.WORKSPACE) {
                 sh """
                     cd terraform
-                    #sed -i s/REPLICAS/2/ autoscalinggroup.tf
-                    #sed -i s/REPLI_MAX/4/ autoscalinggroup.tf
                     terraform init
                     terraform apply -auto-approve
-                    #sleep 1m
-                    #sed -i s/2/1/ autoscalinggroup.tf
-                    #sed -i s/4/2/ autoscalinggroup.tf
-                    #terraform apply -auto-approve
                 """
             }
         }
