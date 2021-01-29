@@ -5,7 +5,14 @@ node{
         def BRANCH_NAME = "main"
 
         message = "PIPELINE STARTED IN BRANCH $BRANCH_NAME - Build $BUILD_NUMBER"
-
+        
+        stage('clean') {
+            dir(env.WORKSPACE) {
+                sh """
+                    rm -rf $WORKSPACE/*
+                """
+            }
+        }
         stage("cloning_$PROJECT") {
                 checkout([$class: 'GitSCM',
                     userRemoteConfigs: [[url: "$REPO_GIT"]],
