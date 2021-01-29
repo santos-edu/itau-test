@@ -14,11 +14,6 @@ resource "aws_launch_configuration" "itau-test" {
   }
 }
 
-//resource "aws_key_pair" "keypar-itau" {
-//  key_name   = "keypar-itau"
-//  public_key = "${file("${var.key_path}")}"
-//}
-
 resource "aws_autoscaling_policy" "autopolicy" {
   name                   = "terraform-autoplicy"
   scaling_adjustment     = 1
