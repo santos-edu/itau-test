@@ -1,0 +1,81 @@
+node{
+    try {
+        def PROJECT = "itau-test"
+        def REPO_GIT = "git@github.com:santos-edu/itau-test.git"
+        def BRANCH_NAME = "main"
+        def IMAGE_VERSION = "$BUILD_NUMBER"
+
+        def ECR_URL = "268510435705.dkr.ecr.sa-east-1.amazonaws.com/itau-test"
+
+        message = "PIPELINE STARTED IN BRANCH $BRANCH_NAME - Build $BUILD_NUMBER"
+
+        stage("cloning_$PROJECT") {
+                checkout([$class: 'GitSCM',
+                    userRemoteConfigs: [[url: "$REPO_GIT"]],
+                    branches: [[name: "$BRANCH_NAME"]],
+                    credentialsId: 'TxMVYzKaAYMhskKNiqav',
+                    clean: false,
+                    extensions: [[$class: 'SubmoduleOption',
+                                    disableSubmodules: false,
+                                    parentCredentials: false,
+                                    recursiveSubmodules: true,
+                                    reference: '',
+                                    trackingSubmodules: false]],
+                    doGenerateSubmoduleConfigurations: false,
+                    submoduleCfg: []
+                ])
+        }
+
+        stage('app_build') {
+            dir(env.WORKSPACE) {
+                sh """
+                    echo app build
+                """
+            }
+        }
+
+        stage('unit_tests') {
+            dir(env.WORKSPACE) {
+                sh """
+                    echo teste
+                """
+            }
+        }
+
+        stage('push_container_to_ECR') {
+            def LOGIN_CMD = sh(script: "aws ecr get-login --no-include-email --region sa-east-1", returnStdout: true)
+            dir(env.WORKSPACE) {
+                sh """
+                    cd jenkins
+                    ${LOGIN_CMD}
+                    docker build --no-cache -t $ECR_URL:$IMAGE_VERSION -f Dockerfile .
+                    docker push $ECR_URL:$IMAGE_VERSION
+                """
+            }
+        }
+
+        stage('terraform_create_deploy') {
+            dir(env.WORKSPACE) {
+                sh """
+                    cd terraform
+                    sed -i s/__ID__/$IMAGE_VERSION/ ../user-data/bootstrap.sh
+                    sed -i s/REPLICAS/4/ autoscalinggroup.tf
+                    sed -i s/REPLI_MAX/8/ autoscalinggroup.tf
+                    terraform init
+                    terraform apply -auto-approve
+                    sleep 1m
+                    sed -i s/4/2/ autoscalinggroup.tf
+                    sed -i s/8/4/ autoscalinggroup.tf
+                    terraform apply -auto-approve
+                    docker system prune -a -f
+                """
+            }
+        }
+
+    } catch (error) {
+        currentBuild.result = "FAILED"
+        throw error
+    } finally {
+        currentBuild.result = "SUCCESS"
+    }
+}
